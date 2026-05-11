@@ -1,0 +1,112 @@
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+.hero {
+  margin-bottom: var(--space-2xl);
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 6rem);
+  letter-spacing: 4px;
+  line-height: 1;
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-primary);
+}
+
+.accent {
+  color: var(--color-accent);
+}
+
+.heroSub {
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+}
+
+.filters {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-xl);
+}
+
+.filter {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffffff 0%, #e8f0fd 100%);
+  border: 1.5px solid #3a7bd5;
+  color: #3a7bd5;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.filter:hover {
+  background: linear-gradient(135deg, #e8f0fd 0%, #d0e3ff 100%);
+  box-shadow: 0 2px 8px rgba(58, 123, 213, 0.2);
+}
+
+.filterActive {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ddeeff 0%, #b8d4ff 100%);
+  border: 2px solid #3a7bd5;
+  color: #3a7bd5;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.2s;
+  box-shadow: 0 0 12px rgba(58, 123, 213, 0.4), 0 0 24px rgba(58, 123, 213, 0.2);
+}
+
+.error {
+  color: var(--color-accent);
+  background: rgba(124, 111, 208, 0.08);
+  border: 1px solid rgba(124, 111, 208, 0.3);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+
+.pageBtn {
+  padding: var(--space-sm) var(--space-xl);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.pageBtn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.pageBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .main {
+    padding: var(--space-lg) var(--space-md);
+  }
+}

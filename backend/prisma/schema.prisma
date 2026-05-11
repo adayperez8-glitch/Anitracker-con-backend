@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  power     String   @default("")
+  bio       String   @default("")
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  animeList        UserAnime[]
+  sentRequests     Friendship[]       @relation("Requester")
+  receivedRequests Friendship[]       @relation("Receiver")
+  sentMessages     Message[]          @relation("Sender")
+  receivedMessages Message[]          @relation("Receiver")
+  recommendations  Recommendation[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model UserAnime {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  animeId        Int
+  animeTitle     String
+  animeImage     String   @default("")
+  status         AnimeStatus @default(PENDING)
+  currentEpisode Int      @default(0)
+  totalEpisodes  Int      @default(0)
+  isPublic       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, animeId])
+}
+
+enum AnimeStatus {
+  WATCHING
+  COMPLETED
+  PAUSED
+  PENDING
+}
+
+model Friendship {
+  id            Int              @id @default(autoincrement())
+  requesterId   Int
+  receiverId    Int
+  status        FriendshipStatus @default(PENDING)
+  canSeeStatus  Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+
+  requester User @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  receiver  User @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, receiverId])
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  receiverId Int?
+  content    String
+  createdAt  DateTime @default(now())
+
+  sender   User  @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User? @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model Recommendation {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  animeTitle  String
+  animeImage  String   @default("")
+  description String   @default("")
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
