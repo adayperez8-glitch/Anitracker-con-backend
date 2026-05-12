@@ -75,9 +75,23 @@ export async function getMe(req, res, next) {
 
 export async function updateMe(req, res, next) {
   try {
-    const data = { ...req.validatedBody }
-    if (data.password) {
-      data.password = await bcrypt.hash(data.password, 10)
+    const { currentPassword, newPassword, ...rest } = req.validatedBody
+    const data = { ...rest }
+
+    if (newPassword) {
+      if (!currentPassword) {
+        const err = new Error('Debes proporcionar tu contraseña actual')
+        err.statusCode = 400
+        throw err
+      }
+      const userDb = await prisma.user.findUnique({ where: { id: req.user.id } })
+      const valid = await bcrypt.compare(currentPassword, userDb.password)
+      if (!valid) {
+        const err = new Error('La contraseña actual no es correcta')
+        err.statusCode = 401
+        throw err
+      }
+      data.password = await bcrypt.hash(newPassword, 10)
     }
 
     const user = await prisma.user.update({

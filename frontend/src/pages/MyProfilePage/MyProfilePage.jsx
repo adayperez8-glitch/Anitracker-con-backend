@@ -29,7 +29,8 @@ export default function MyProfilePage() {
   const [cargando, setCargando] = useState(true)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
-  const [password, setPassword] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
 
   useEffect(() => {
     cargarPerfil()
@@ -55,13 +56,17 @@ export default function MyProfilePage() {
     setMsg('')
     try {
       const body = { name, power, bio }
-      if (password) body.password = password
+      if (newPassword) {
+        body.currentPassword = currentPassword
+        body.newPassword = newPassword
+      }
       await peticion('/api/users/me', {
         method: 'PATCH',
         body: JSON.stringify(body),
       })
       setMsg('Perfil actualizado')
-      setPassword('')
+      setCurrentPassword('')
+      setNewPassword('')
     } catch (err) {
       setMsg(err.message)
     } finally {
@@ -118,12 +123,23 @@ export default function MyProfilePage() {
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Nueva contraseña (déjalo vacío para no cambiar)</label>
+            <label className={styles.label}>Contraseña actual</label>
             <input
               type="password"
               className={styles.input}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Contraseña actual"
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>Nueva contraseña</label>
+            <input
+              type="password"
+              className={styles.input}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Nueva contraseña"
             />
           </div>
