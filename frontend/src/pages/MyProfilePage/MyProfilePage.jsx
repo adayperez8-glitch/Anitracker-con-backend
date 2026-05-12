@@ -21,11 +21,14 @@ const POWERS = [
 ]
 
 export default function MyProfilePage() {
-  const { usuario, logout } = useAuth()
+  const { usuario, logout, actualizarUsuario } = useAuth()
   const { peticion } = useApi()
   const [name, setName] = useState('')
   const [power, setPower] = useState('')
   const [bio, setBio] = useState('')
+  const [avatar, setAvatar] = useState('')
+  const [avatarFile, setAvatarFile] = useState(null)
+  const [avatarPreview, setAvatarPreview] = useState('')
   const [cargando, setCargando] = useState(true)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
@@ -43,6 +46,7 @@ export default function MyProfilePage() {
       setName(data.name)
       setPower(data.power || '')
       setBio(data.bio || '')
+      setAvatar(data.avatar || '')
     } catch {
       setMsg('Error al cargar perfil')
     } finally {
@@ -50,12 +54,21 @@ export default function MyProfilePage() {
     }
   }
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setAvatarFile(file)
+    const reader = new FileReader()
+    reader.onload = (ev) => setAvatarPreview(ev.target.result)
+    reader.readAsDataURL(file)
+  }
+
   const handleSave = async (e) => {
     e.preventDefault()
     setSaving(true)
     setMsg('')
     try {
-      const body = { name, power, bio }
+      const body = { name, power, bio, avatar: avatarPreview || avatar }
       if (newPassword) {
         body.currentPassword = currentPassword
         body.newPassword = newPassword
@@ -67,6 +80,8 @@ export default function MyProfilePage() {
       setMsg('Perfil actualizado')
       setCurrentPassword('')
       setNewPassword('')
+      setAvatarFile(null)
+      actualizarUsuario({ name, avatar: avatarPreview || avatar })
     } catch (err) {
       setMsg(err.message)
     } finally {
@@ -120,6 +135,27 @@ export default function MyProfilePage() {
               maxLength={500}
               placeholder="Cuéntanos algo sobre ti..."
             />
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>Foto de perfil</label>
+            <div className={styles.avatarRow}>
+              <div className={styles.avatarPreview}>
+                {(avatarPreview || avatar) ? (
+                  <img src={avatarPreview || avatar} alt="avatar" className={styles.avatarImg} />
+                ) : (
+                  <span className={styles.avatarLetter}>
+                    {name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                className={styles.fileInput}
+                onChange={handleAvatarChange}
+              />
+            </div>
           </div>
 
           <div className={styles.field}>
@@ -199,7 +235,11 @@ function FriendRequests({ peticion }) {
       {requests.map((r) => (
         <div key={r.id} className={styles.requestCard}>
           <div className={styles.requestAvatar}>
-            {r.requester.name.charAt(0).toUpperCase()}
+            {r.requester.avatar ? (
+              <img src={r.requester.avatar} alt={r.requester.name} className={styles.avatarImg} />
+            ) : (
+              r.requester.name.charAt(0).toUpperCase()
+            )}
           </div>
           <div>
             <p className={styles.requestName}>{r.requester.name}</p>

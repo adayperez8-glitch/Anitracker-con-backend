@@ -156,6 +156,26 @@
   box-shadow: 0 0 6px rgba(125, 212, 252, 0.3);
 }
 
+.navAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.navAvatarLetter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
 .userInfo {
   font-size: 0.75rem;
   color: var(--color-accent-2);

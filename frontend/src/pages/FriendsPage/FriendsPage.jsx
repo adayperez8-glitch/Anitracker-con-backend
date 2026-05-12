@@ -91,7 +91,13 @@ export default function FriendsPage() {
             <div className={styles.searchResults}>
               {searchResults.map((u) => (
                 <div key={u.id} className={styles.searchCard}>
-                  <div className={styles.avatar}>{u.name.charAt(0).toUpperCase()}</div>
+                  <div className={styles.avatar}>
+                    {u.avatar ? (
+                      <img src={u.avatar} alt={u.name} className={styles.avatarImg} />
+                    ) : (
+                      u.name.charAt(0).toUpperCase()
+                    )}
+                  </div>
                   <div>
                     <p className={styles.friendName}>{u.name}</p>
                     {u.power && <span className={styles.power}>{u.power}</span>}
@@ -120,7 +126,11 @@ export default function FriendsPage() {
                 <div key={f.friendshipId} className={styles.card}>
                   <Link to={`/profile/${f.user.id}`} className={styles.cardLink}>
                     <div className={styles.avatar}>
-                      {f.user.name.charAt(0).toUpperCase()}
+                      {f.user.avatar ? (
+                        <img src={f.user.avatar} alt={f.user.name} className={styles.avatarImg} />
+                      ) : (
+                        f.user.name.charAt(0).toUpperCase()
+                      )}
                     </div>
                     <div>
                       <p className={styles.friendName}>{f.user.name}</p>

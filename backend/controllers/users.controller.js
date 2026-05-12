@@ -8,7 +8,7 @@ export async function listUsers(req, res, next) {
 
     const users = await prisma.user.findMany({
       where,
-      select: { id: true, name: true, power: true, bio: true, role: true },
+      select: { id: true, name: true, power: true, bio: true, avatar: true, role: true },
       orderBy: { name: 'asc' },
     })
 
@@ -25,7 +25,7 @@ export async function getProfile(req, res, next) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
-        id: true, name: true, power: true, bio: true, role: true,
+        id: true, name: true, power: true, bio: true, avatar: true, role: true,
         animeList: {
           where: { isPublic: true },
           select: { id: true, animeId: true, animeTitle: true, animeImage: true, status: true, currentEpisode: true, totalEpisodes: true },
@@ -55,7 +55,7 @@ export async function getMe(req, res, next) {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
       select: {
-        id: true, email: true, name: true, power: true, bio: true, role: true,
+        id: true, email: true, name: true, power: true, bio: true, avatar: true, role: true,
         animeList: {
           select: { id: true, animeId: true, animeTitle: true, animeImage: true, status: true, currentEpisode: true, totalEpisodes: true, isPublic: true },
           orderBy: { createdAt: 'desc' },
@@ -97,7 +97,7 @@ export async function updateMe(req, res, next) {
     const user = await prisma.user.update({
       where: { id: req.user.id },
       data,
-      select: { id: true, email: true, name: true, power: true, bio: true, role: true },
+      select: { id: true, email: true, name: true, power: true, bio: true, avatar: true, role: true },
     })
 
     res.json(user)

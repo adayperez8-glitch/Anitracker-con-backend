@@ -6,4 +6,5 @@ export const updateUserSchema = z.object({
   bio: z.string().max(500).optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().min(6, 'La nueva contraseña debe tener al menos 6 caracteres').optional(),
+  avatar: z.string().optional(),
 })

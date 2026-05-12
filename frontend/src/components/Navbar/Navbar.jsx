@@ -119,7 +119,12 @@ export default function Navbar() {
           {usuario && (
             <li>
               <NavLink to="/my-profile" className={({ isActive }) => isActive ? styles.activeLink : styles.link} onClick={() => setMenuOpen(false)}>
-                👤 {usuario.name}
+                {usuario.avatar ? (
+                  <img src={usuario.avatar} alt="" className={styles.navAvatar} />
+                ) : (
+                  <span className={styles.navAvatarLetter}>{usuario.name.charAt(0).toUpperCase()}</span>
+                )}
+                {usuario.name}
               </NavLink>
             </li>
           )}

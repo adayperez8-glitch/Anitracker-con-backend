@@ -46,7 +46,11 @@ export default function ProfilePage() {
       <div className={styles.container}>
         <div className={styles.header}>
           <div className={styles.avatar}>
-            {profile.name.charAt(0).toUpperCase()}
+            {profile.avatar ? (
+              <img src={profile.avatar} alt={profile.name} className={styles.avatarImg} />
+            ) : (
+              profile.name.charAt(0).toUpperCase()
+            )}
           </div>
           <h1 className={styles.name}>{profile.name}</h1>
           {profile.power && <span className={styles.power}>{profile.power}</span>}

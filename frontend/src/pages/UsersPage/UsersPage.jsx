@@ -63,7 +63,11 @@ export default function UsersPage() {
           {users.map((u) => (
             <Link to={`/profile/${u.id}`} key={u.id} className={styles.card}>
               <div className={styles.avatar}>
-                {u.name.charAt(0).toUpperCase()}
+                {u.avatar ? (
+                  <img src={u.avatar} alt={u.name} className={styles.avatarImg} />
+                ) : (
+                  u.name.charAt(0).toUpperCase()
+                )}
               </div>
               <h3 className={styles.userName}>{u.name}</h3>
               {u.power && (
