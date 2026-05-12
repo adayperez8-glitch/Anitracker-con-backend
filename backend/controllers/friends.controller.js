@@ -44,7 +44,16 @@ export async function listRequests(req, res, next) {
 
 export async function sendRequest(req, res, next) {
   try {
-    const { receiverId } = req.validatedBody
+    let { receiverId, receiverName } = req.validatedBody
+    if (receiverName) {
+      const user = await prisma.user.findFirst({ where: { name: receiverName } })
+      if (!user) {
+        const err = new Error('Usuario no encontrado con ese nombre')
+        err.statusCode = 404
+        throw err
+      }
+      receiverId = user.id
+    }
 
     if (receiverId === req.user.id) {
       const err = new Error('No puedes enviarte solicitud a ti mismo')

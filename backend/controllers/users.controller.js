@@ -1,9 +1,10 @@
+import bcrypt from 'bcryptjs'
 import prisma from '../lib/prisma.js'
 
 export async function listUsers(req, res, next) {
   try {
-    const { power } = req.query
-    const where = power ? { power } : {}
+    const { power, q } = req.query
+    const where = { ...(power ? { power } : {}), ...(q ? { name: { contains: q, mode: 'insensitive' } } : {}) }
 
     const users = await prisma.user.findMany({
       where,
@@ -74,9 +75,14 @@ export async function getMe(req, res, next) {
 
 export async function updateMe(req, res, next) {
   try {
+    const data = { ...req.validatedBody }
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password, 10)
+    }
+
     const user = await prisma.user.update({
       where: { id: req.user.id },
-      data: req.validatedBody,
+      data,
       select: { id: true, email: true, name: true, power: true, bio: true, role: true },
     })
 

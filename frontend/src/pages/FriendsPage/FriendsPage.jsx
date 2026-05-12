@@ -8,7 +8,9 @@ export default function FriendsPage() {
   const [friends, setFriends] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
-  const [receiverId, setReceiverId] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [searching, setSearching] = useState(false)
   const [addMsg, setAddMsg] = useState('')
 
   useEffect(() => {
@@ -26,16 +28,33 @@ export default function FriendsPage() {
     }
   }
 
-  const enviarSolicitud = async (e) => {
-    e.preventDefault()
+  const buscarUsuarios = async (q) => {
+    setSearchQuery(q)
+    if (!q.trim()) {
+      setSearchResults([])
+      return
+    }
+    setSearching(true)
+    try {
+      const data = await peticion(`/api/users?q=${encodeURIComponent(q)}`)
+      setSearchResults(data.filter((u) => u.id !== JSON.parse(localStorage.getItem('usuario') || '{}').id))
+    } catch {
+      setSearchResults([])
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  const enviarSolicitud = async (receiverName) => {
     setAddMsg('')
     try {
       await peticion('/api/friends', {
         method: 'POST',
-        body: JSON.stringify({ receiverId: parseInt(receiverId) }),
+        body: JSON.stringify({ receiverName }),
       })
-      setAddMsg('Solicitud enviada')
-      setReceiverId('')
+      setAddMsg(`Solicitud enviada a ${receiverName}`)
+      setSearchQuery('')
+      setSearchResults([])
     } catch (err) {
       setAddMsg(err.message)
     }
@@ -59,24 +78,42 @@ export default function FriendsPage() {
 
         <div className={styles.addSection}>
           <h2 className={styles.sectionTitle}>Añadir amigo</h2>
-          <form className={styles.addForm} onSubmit={enviarSolicitud}>
+          <div className={styles.addForm}>
             <input
               className={styles.input}
-              type="number"
-              placeholder="ID del usuario"
-              value={receiverId}
-              onChange={(e) => setReceiverId(e.target.value)}
+              placeholder="Buscar usuario por nombre..."
+              value={searchQuery}
+              onChange={(e) => buscarUsuarios(e.target.value)}
             />
-            <button type="submit" className={styles.btn}>Enviar solicitud</button>
-          </form>
-          {addMsg && <p className={addMsg === 'Solicitud enviada' ? styles.success : styles.errorMsg}>{addMsg}</p>}
+          </div>
+          {searching && <p className={styles.msg}>Buscando...</p>}
+          {!searching && searchResults.length > 0 && (
+            <div className={styles.searchResults}>
+              {searchResults.map((u) => (
+                <div key={u.id} className={styles.searchCard}>
+                  <div className={styles.avatar}>{u.name.charAt(0).toUpperCase()}</div>
+                  <div>
+                    <p className={styles.friendName}>{u.name}</p>
+                    {u.power && <span className={styles.power}>{u.power}</span>}
+                  </div>
+                  <button className={styles.btn} onClick={() => enviarSolicitud(u.name)}>
+                    + Amigo
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {!searching && searchQuery && searchResults.length === 0 && (
+            <p className={styles.msg}>No se encontraron usuarios</p>
+          )}
+          {addMsg && <p className={addMsg.startsWith('Solicitud enviada') ? styles.success : styles.errorMsg}>{addMsg}</p>}
         </div>
 
         <section>
           <h2 className={styles.sectionTitle}>Mis amigos ({friends.length})</h2>
           {error && <p className={styles.errorMsg}>{error}</p>}
           {friends.length === 0 ? (
-            <p className={styles.empty}>Aún no tienes amigos. ¡Envía una solicitud!</p>
+            <p className={styles.empty}>Aún no tienes amigos. ¡Busca y envía una solicitud!</p>
           ) : (
             <div className={styles.grid}>
               {friends.map((f) => (
