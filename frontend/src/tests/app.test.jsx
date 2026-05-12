@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { WatchlistProvider, useWatchlist } from '../context/WatchlistContext'
 import { AnimeProvider, useAnime } from '../context/AnimeContext'
+import { AuthProvider } from '../context/AuthContext'
 import { MemoryRouter } from 'react-router-dom'
 
 // ─── Test 1: WatchlistContext ────────────────────────────────────────────────
@@ -27,9 +28,11 @@ describe('WatchlistContext', () => {
 
   it('starts empty', async () => {
     render(
-      <WatchlistProvider>
-        <WatchlistConsumer />
-      </WatchlistProvider>
+      <AuthProvider>
+        <WatchlistProvider>
+          <WatchlistConsumer />
+        </WatchlistProvider>
+      </AuthProvider>
     )
     await waitFor(() => {
       expect(screen.getByTestId('loading').textContent).toBe('no')
@@ -40,7 +43,7 @@ describe('WatchlistContext', () => {
 
   it('adds and removes anime correctly', async () => {
     const fetchMock = vi.fn()
-    // GET /api/anime (fetch on mount) - empty
+    // GET /api/anime (fetch on mount)
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => [] })
     // POST /api/anime (add)
     fetchMock.mockResolvedValueOnce({
@@ -51,11 +54,14 @@ describe('WatchlistContext', () => {
 
     vi.stubGlobal('fetch', fetchMock)
     localStorage.setItem('token', 'fake-token')
+    localStorage.setItem('usuario', JSON.stringify({ id: 1, name: 'Test' }))
 
     render(
-      <WatchlistProvider>
-        <WatchlistConsumer />
-      </WatchlistProvider>
+      <AuthProvider>
+        <WatchlistProvider>
+          <WatchlistConsumer />
+        </WatchlistProvider>
+      </AuthProvider>
     )
 
     await waitFor(() => {
@@ -94,11 +100,14 @@ describe('WatchlistContext', () => {
 
     vi.stubGlobal('fetch', fetchMock)
     localStorage.setItem('token', 'fake-token')
+    localStorage.setItem('usuario', JSON.stringify({ id: 1, name: 'Test' }))
 
     render(
-      <WatchlistProvider>
-        <WatchlistConsumer />
-      </WatchlistProvider>
+      <AuthProvider>
+        <WatchlistProvider>
+          <WatchlistConsumer />
+        </WatchlistProvider>
+      </AuthProvider>
     )
 
     await waitFor(() => {
@@ -211,9 +220,11 @@ describe('AnimeCard', () => {
   it('renders title and score', () => {
     render(
       <MemoryRouter>
-        <WatchlistProvider>
-          <AnimeCard anime={mockAnime} />
-        </WatchlistProvider>
+        <AuthProvider>
+          <WatchlistProvider>
+            <AnimeCard anime={mockAnime} />
+          </WatchlistProvider>
+        </AuthProvider>
       </MemoryRouter>
     )
     expect(screen.getByText('Attack on Titan')).toBeInTheDocument()
@@ -223,9 +234,11 @@ describe('AnimeCard', () => {
   it('shows episode count', () => {
     render(
       <MemoryRouter>
-        <WatchlistProvider>
-          <AnimeCard anime={mockAnime} />
-        </WatchlistProvider>
+        <AuthProvider>
+          <WatchlistProvider>
+            <AnimeCard anime={mockAnime} />
+          </WatchlistProvider>
+        </AuthProvider>
       </MemoryRouter>
     )
     expect(screen.getByText('87 eps')).toBeInTheDocument()

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useApi } from '../hooks/useApi'
+import { useAuth } from './AuthContext'
 
 const WatchlistContext = createContext(null)
 
@@ -14,26 +15,28 @@ export function WatchlistProvider({ children }) {
   const [watchlist, setWatchlist] = useState([])
   const [cargando, setCargando] = useState(true)
   const { peticion } = useApi()
+  const { usuario } = useAuth()
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      fetchList()
-    } else {
+    setWatchlist([])
+    setCargando(true)
+    if (!usuario) {
       setCargando(false)
+      return
     }
-  }, [])
-
-  const fetchList = async () => {
-    try {
-      const data = await peticion('/api/anime')
-      setWatchlist(data)
-    } catch {
-      setWatchlist([])
-    } finally {
-      setCargando(false)
-    }
-  }
+    let cancel = false
+    ;(async () => {
+      try {
+        const data = await peticion('/api/anime')
+        if (!cancel) setWatchlist(data)
+      } catch {
+        if (!cancel) setWatchlist([])
+      } finally {
+        if (!cancel) setCargando(false)
+      }
+    })()
+    return () => { cancel = true }
+  }, [usuario])
 
   const addToWatchlist = async (anime) => {
     try {
