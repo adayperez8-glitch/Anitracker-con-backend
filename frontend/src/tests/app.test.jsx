@@ -7,10 +7,11 @@ import { MemoryRouter } from 'react-router-dom'
 // ─── Test 1: WatchlistContext ────────────────────────────────────────────────
 
 function WatchlistConsumer() {
-  const { watchlist, addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist()
+  const { watchlist, addToWatchlist, removeFromWatchlist, isInWatchlist, cargando } = useWatchlist()
   const fakeAnime = { mal_id: 1, title: 'Naruto', images: {}, episodes: 220 }
   return (
     <div>
+      <p data-testid="loading">{cargando ? 'yes' : 'no'}</p>
       <p data-testid="count">{watchlist.length}</p>
       <p data-testid="inList">{isInWatchlist(1) ? 'yes' : 'no'}</p>
       <button onClick={() => addToWatchlist(fakeAnime)}>Add</button>
@@ -20,40 +21,103 @@ function WatchlistConsumer() {
 }
 
 describe('WatchlistContext', () => {
-  it('starts empty', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('starts empty', async () => {
     render(
       <WatchlistProvider>
         <WatchlistConsumer />
       </WatchlistProvider>
     )
+    await waitFor(() => {
+      expect(screen.getByTestId('loading').textContent).toBe('no')
+    })
     expect(screen.getByTestId('count').textContent).toBe('0')
     expect(screen.getByTestId('inList').textContent).toBe('no')
   })
 
-  it('adds and removes anime correctly', () => {
+  it('adds and removes anime correctly', async () => {
+    const fetchMock = vi.fn()
+    // GET /api/anime (fetch on mount) - empty
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => [] })
+    // POST /api/anime (add)
+    fetchMock.mockResolvedValueOnce({
+      ok: true, json: async () => ({ id: 1, animeId: 1, animeTitle: 'Naruto', currentEpisode: 0 }),
+    })
+    // DELETE /api/anime/1 (remove)
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => {} })
+
+    vi.stubGlobal('fetch', fetchMock)
+    localStorage.setItem('token', 'fake-token')
+
     render(
       <WatchlistProvider>
         <WatchlistConsumer />
       </WatchlistProvider>
     )
-    fireEvent.click(screen.getByText('Add'))
-    expect(screen.getByTestId('count').textContent).toBe('1')
-    expect(screen.getByTestId('inList').textContent).toBe('yes')
 
-    fireEvent.click(screen.getByText('Remove'))
-    expect(screen.getByTestId('count').textContent).toBe('0')
-    expect(screen.getByTestId('inList').textContent).toBe('no')
+    await waitFor(() => {
+      expect(screen.getByTestId('loading').textContent).toBe('no')
+    })
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Add'))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('count').textContent).toBe('1')
+      expect(screen.getByTestId('inList').textContent).toBe('yes')
+    })
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Remove'))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('count').textContent).toBe('0')
+      expect(screen.getByTestId('inList').textContent).toBe('no')
+    })
+
+    localStorage.removeItem('token')
   })
 
-  it('does not add duplicates', () => {
+  it('does not add duplicates', async () => {
+    const fetchMock = vi.fn()
+    // GET /api/anime (fetch on mount) - empty
+    fetchMock.mockResolvedValueOnce({ ok: true, json: async () => [] })
+    // POST /api/anime (first add)
+    fetchMock.mockResolvedValueOnce({
+      ok: true, json: async () => ({ id: 1, animeId: 1, animeTitle: 'Naruto', currentEpisode: 0 }),
+    })
+
+    vi.stubGlobal('fetch', fetchMock)
+    localStorage.setItem('token', 'fake-token')
+
     render(
       <WatchlistProvider>
         <WatchlistConsumer />
       </WatchlistProvider>
     )
-    fireEvent.click(screen.getByText('Add'))
-    fireEvent.click(screen.getByText('Add'))
-    expect(screen.getByTestId('count').textContent).toBe('1')
+
+    await waitFor(() => {
+      expect(screen.getByTestId('loading').textContent).toBe('no')
+    })
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Add'))
+    })
+
+    await act(async () => {
+      fireEvent.click(screen.getByText('Add'))
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('count').textContent).toBe('1')
+    })
+
+    localStorage.removeItem('token')
   })
 })
 

@@ -13,6 +13,7 @@ const WALLPAPERS = [
   { label: '🟣 Jujutsu Kaisen', value: 'https://w.wallhaven.cc/full/5g/wallhaven-5g8775.png' },
   { label: '🗿 Berserk', value: 'https://w.wallhaven.cc/full/l3/wallhaven-l3zyd2.jpg' },
 ]
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [wallpaper, setWallpaper] = useState('none')
@@ -77,6 +78,21 @@ export default function Navbar() {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/users" className={({ isActive }) => isActive ? styles.activeLink : styles.link} onClick={() => setMenuOpen(false)}>
+              Usuarios
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/friends" className={({ isActive }) => isActive ? styles.activeLink : styles.link} onClick={() => setMenuOpen(false)}>
+              Amigos
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/chat" className={({ isActive }) => isActive ? styles.activeLink : styles.link} onClick={() => setMenuOpen(false)}>
+              Chat
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/mylist" className={({ isActive }) => isActive ? styles.activeLink : styles.link} onClick={() => setMenuOpen(false)}>
               Mi Lista
               {watchlist.length > 0 && (
@@ -102,7 +118,9 @@ export default function Navbar() {
           </li>
           {usuario && (
             <li>
-              <span className={styles.userInfo}>👤 {usuario.name}</span>
+              <NavLink to="/my-profile" className={({ isActive }) => isActive ? styles.activeLink : styles.link} onClick={() => setMenuOpen(false)}>
+                👤 {usuario.name}
+              </NavLink>
             </li>
           )}
           {usuario && (

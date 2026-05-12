@@ -19,13 +19,21 @@ const STATUS_FILTER_OPTIONS = [
 ]
 
 export default function MyListPage() {
-  const { watchlist, removeFromWatchlist, updateProgress, updateStatus } = useWatchlist()
+  const { watchlist, removeFromWatchlist, updateProgress, updateStatus, cargando } = useWatchlist()
   const [filter, setFilter] = useState('all')
   const navigate = useNavigate()
 
   const filtered = filter === 'all'
     ? watchlist
     : watchlist.filter((a) => a.status === filter)
+
+  if (cargando) {
+    return (
+      <main className={styles.main}>
+        <p className={styles.loading}>Cargando tu lista...</p>
+      </main>
+    )
+  }
 
   if (watchlist.length === 0) {
     return (
@@ -68,23 +76,22 @@ export default function MyListPage() {
 
       <div className={styles.list}>
         {filtered.map((anime) => {
-          const totalEps = anime.episodes || '?'
+          const totalEps = anime.totalEpisodes || '?'
           const progress = totalEps !== '?' && totalEps > 0
             ? Math.min(100, Math.round((anime.currentEpisode / totalEps) * 100))
             : null
           const statusInfo = STATUS_LABELS[anime.status] || STATUS_LABELS[STATUS.PENDING]
-          const image = anime.images?.jpg?.image_url
 
           return (
-            <article key={anime.mal_id} className={styles.item}>
+            <article key={anime.id} className={styles.item}>
               <div
                 className={styles.itemPoster}
-                onClick={() => navigate(`/anime/${anime.mal_id}`)}
+                onClick={() => navigate(`/anime/${anime.animeId}`)}
                 role="button"
                 tabIndex={0}
               >
-                {image
-                  ? <img src={image} alt={anime.title} className={styles.itemImage} />
+                {anime.animeImage
+                  ? <img src={anime.animeImage} alt={anime.animeTitle} className={styles.itemImage} />
                   : <div className={styles.noImage}>🎌</div>}
               </div>
 
@@ -92,15 +99,15 @@ export default function MyListPage() {
                 <div className={styles.itemTop}>
                   <h3
                     className={styles.itemTitle}
-                    onClick={() => navigate(`/anime/${anime.mal_id}`)}
+                    onClick={() => navigate(`/anime/${anime.animeId}`)}
                     role="button"
                     tabIndex={0}
                   >
-                    {anime.title}
+                    {anime.animeTitle}
                   </h3>
                   <button
                     className={styles.removeBtn}
-                    onClick={() => removeFromWatchlist(anime.mal_id)}
+                    onClick={() => removeFromWatchlist(anime.animeId)}
                     aria-label="Eliminar"
                   >
                     ✕
@@ -111,9 +118,6 @@ export default function MyListPage() {
                   <span className={styles.statusBadge} data-status={anime.status}>
                     {statusInfo.emoji} {statusInfo.label}
                   </span>
-                  {anime.score && (
-                    <span className={styles.score}>★ {anime.score}</span>
-                  )}
                 </div>
 
                 <div className={styles.progressSection}>
@@ -122,7 +126,7 @@ export default function MyListPage() {
                     <div className={styles.progressControls}>
                       <button
                         className={styles.progressBtn}
-                        onClick={() => updateProgress(anime.mal_id, anime.currentEpisode - 1)}
+                        onClick={() => updateProgress(anime.animeId, anime.currentEpisode - 1)}
                       >−</button>
                       <span className={styles.progressValue}>
                         Cap. <strong>{anime.currentEpisode}</strong>
@@ -130,7 +134,7 @@ export default function MyListPage() {
                       </span>
                       <button
                         className={styles.progressBtn}
-                        onClick={() => updateProgress(anime.mal_id, anime.currentEpisode + 1)}
+                        onClick={() => updateProgress(anime.animeId, anime.currentEpisode + 1)}
                       >+</button>
                     </div>
                   </div>
@@ -148,7 +152,7 @@ export default function MyListPage() {
                 <select
                   className={styles.statusSelect}
                   value={anime.status}
-                  onChange={(e) => updateStatus(anime.mal_id, e.target.value)}
+                  onChange={(e) => updateStatus(anime.animeId, e.target.value)}
                 >
                   {Object.entries(STATUS_LABELS).map(([val, { label, emoji }]) => (
                     <option key={val} value={val}>{emoji} {label}</option>
