@@ -18,7 +18,7 @@ export async function getMessages(req, res, next) {
     const messages = await prisma.message.findMany({
       where,
       include: {
-        sender: { select: { id: true, name: true, avatar: true } },
+        sender: { select: { id: true, name: true } },
       },
       orderBy: { createdAt: 'asc' },
       take: 100,
@@ -58,7 +58,7 @@ export async function sendMessage(req, res, next) {
         content,
       },
       include: {
-        sender: { select: { id: true, name: true, avatar: true } },
+        sender: { select: { id: true, name: true } },
       },
     })
 

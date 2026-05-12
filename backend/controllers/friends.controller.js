@@ -11,8 +11,8 @@ export async function listFriends(req, res, next) {
         ],
       },
       include: {
-        requester: { select: { id: true, name: true, power: true, avatar: true } },
-        receiver: { select: { id: true, name: true, power: true, avatar: true } },
+        requester: { select: { id: true, name: true, power: true } },
+        receiver: { select: { id: true, name: true, power: true } },
       },
     })
 
@@ -32,7 +32,7 @@ export async function listRequests(req, res, next) {
     const requests = await prisma.friendship.findMany({
       where: { receiverId: req.user.id, status: 'PENDING' },
       include: {
-        requester: { select: { id: true, name: true, power: true, avatar: true } },
+        requester: { select: { id: true, name: true, power: true } },
       },
     })
 

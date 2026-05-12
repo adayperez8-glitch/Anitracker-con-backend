@@ -23,14 +23,14 @@ export async function register(req, res, next) {
     sendWebhook('user_registered', { userId: user.id, email: user.email, name: user.name })
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name, role: user.role, avatar: user.avatar },
+      { id: user.id, email: user.email, name: user.name, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     )
 
     res.status(201).json({
       token,
-      usuario: { id: user.id, email: user.email, name: user.name, role: user.role, avatar: user.avatar },
+      usuario: { id: user.id, email: user.email, name: user.name, role: user.role },
     })
   } catch (err) {
     next(err)
@@ -56,14 +56,14 @@ export async function login(req, res, next) {
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name, role: user.role, avatar: user.avatar },
+      { id: user.id, email: user.email, name: user.name, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     )
 
     res.json({
       token,
-      usuario: { id: user.id, email: user.email, name: user.name, role: user.role, avatar: user.avatar },
+      usuario: { id: user.id, email: user.email, name: user.name, role: user.role },
     })
   } catch (err) {
     next(err)
