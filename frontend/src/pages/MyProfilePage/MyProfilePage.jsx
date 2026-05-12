@@ -26,6 +26,7 @@ export default function MyProfilePage() {
   const [name, setName] = useState('')
   const [power, setPower] = useState('')
   const [bio, setBio] = useState('')
+  const [cargando, setCargando] = useState(true)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
 
@@ -34,6 +35,7 @@ export default function MyProfilePage() {
   }, [])
 
   const cargarPerfil = async () => {
+    setCargando(true)
     try {
       const data = await peticion('/api/users/me')
       setName(data.name)
@@ -41,6 +43,8 @@ export default function MyProfilePage() {
       setBio(data.bio || '')
     } catch {
       setMsg('Error al cargar perfil')
+    } finally {
+      setCargando(false)
     }
   }
 
@@ -59,6 +63,14 @@ export default function MyProfilePage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  if (cargando) {
+    return (
+      <div className={styles.page}>
+        <p className={styles.loading}>Cargando perfil...</p>
+      </div>
+    )
   }
 
   return (

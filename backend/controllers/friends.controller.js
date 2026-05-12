@@ -1,4 +1,5 @@
 import prisma from '../lib/prisma.js'
+import { sendWebhook } from '../lib/webhook.js'
 
 export async function listFriends(req, res, next) {
   try {
@@ -102,6 +103,10 @@ export async function updateRequest(req, res, next) {
       where: { id },
       data: { status, ...(canSeeStatus !== undefined && { canSeeStatus }) },
     })
+
+    if (status === 'ACCEPTED') {
+      sendWebhook('friend_accepted', { friendshipId: id, requesterId: friendship.requesterId, receiverId: req.user.id })
+    }
 
     res.json(updated)
   } catch (err) {

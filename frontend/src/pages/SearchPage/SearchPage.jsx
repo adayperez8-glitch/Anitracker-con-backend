@@ -142,6 +142,13 @@ export default function SearchPage() {
         </div>
       )}
 
+      {!loading && submittedQuery && !error && results.length === 0 && (
+        <div className={styles.emptyState}>
+          <span className={styles.emptyIcon}>😕</span>
+          <p>No se encontraron resultados para <strong>"{submittedQuery}"</strong></p>
+        </div>
+      )}
+
       {!loading && !submittedQuery && (
         <div className={styles.emptyState}>
           <span className={styles.emptyIcon}>🔍</span>

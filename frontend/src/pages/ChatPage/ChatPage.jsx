@@ -12,6 +12,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([])
   const [content, setContent] = useState('')
   const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
   const [friends, setFriends] = useState([])
   const [selectedChat, setSelectedChat] = useState(friendId || 'general')
   const bottomRef = useRef(null)
@@ -39,12 +40,14 @@ export default function ChatPage() {
 
   const cargarMensajes = async () => {
     setCargando(true)
+    setError('')
     try {
       const query = selectedChat === 'general' ? '' : `?receiverId=${selectedChat}`
       const data = await peticion(`/api/messages${query}`)
       setMessages(data)
     } catch {
       setMessages([])
+      setError('Error al cargar mensajes')
     } finally {
       setCargando(false)
     }
@@ -106,6 +109,8 @@ export default function ChatPage() {
           <div className={styles.messages}>
             {cargando ? (
               <p className={styles.loading}>Cargando...</p>
+            ) : error ? (
+              <p className={styles.empty}>{error}</p>
             ) : messages.length === 0 ? (
               <p className={styles.empty}>No hay mensajes aún</p>
             ) : (
