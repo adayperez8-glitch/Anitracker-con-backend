@@ -6,7 +6,7 @@
   },
   "deploy": {
     "startCommand": "npx prisma migrate deploy && npm start",
-    "healthcheckPath": "/api/auth/login",
+    "healthcheckPath": "/api/health",
     "healthcheckTimeout": 100
   }
 }
