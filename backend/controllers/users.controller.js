@@ -73,6 +73,24 @@ export async function getMe(req, res, next) {
   }
 }
 
+export async function deleteUser(req, res, next) {
+  try {
+    const userId = parseInt(req.params.id)
+
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) {
+      const err = new Error('Usuario no encontrado')
+      err.statusCode = 404
+      throw err
+    }
+
+    await prisma.user.delete({ where: { id: userId } })
+    res.json({ message: 'Usuario eliminado' })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export async function updateMe(req, res, next) {
   try {
     const { currentPassword, newPassword, ...rest } = req.validatedBody
