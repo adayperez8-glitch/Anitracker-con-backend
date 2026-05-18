@@ -41,9 +41,19 @@ export default function MyListPage() {
     return () => obs.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (!usuario) return
+    ;(async () => {
+      try {
+        const recs = await peticion(`/api/recommendations/${usuario.id}`, { method: 'GET' })
+        setRecomendados(new Set(recs.map(r => r.animeTitle)))
+      } catch {}
+    })()
+  }, [usuario])
+
   const handleRecommend = async (anime, e) => {
     e.stopPropagation()
-    if (recomendando.current || recomendados.has(anime.animeId)) return
+    if (recomendando.current || recomendados.has(anime.animeTitle)) return
     recomendando.current = true
     try {
       await peticion('/api/recommendations', {
@@ -53,7 +63,7 @@ export default function MyListPage() {
           animeImage: anime.animeImage || '',
         }),
       })
-      setRecomendados(prev => new Set(prev).add(anime.animeId))
+      setRecomendados(prev => new Set(prev).add(anime.animeTitle))
     } catch {
       // ignore
     } finally {
@@ -191,9 +201,9 @@ export default function MyListPage() {
                   <button
                     className={`${styles.recommendBtn} ${wallpaperActive ? styles.recommendBtnWallpaper : ''}`}
                     onClick={(e) => handleRecommend(anime, e)}
-                    disabled={recomendados.has(anime.animeId)}
+                    disabled={recomendados.has(anime.animeTitle)}
                   >
-                    {recomendados.has(anime.animeId) ? '✓ Recomendado' : 'Recomendar'}
+                    {recomendados.has(anime.animeTitle) ? '✓ Recomendado' : 'Recomendar'}
                   </button>
                 )}
                 <select

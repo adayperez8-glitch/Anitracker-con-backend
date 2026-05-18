@@ -19,6 +19,16 @@ export async function addRecommendation(req, res, next) {
   try {
     const { animeTitle, animeImage, description } = req.validatedBody
 
+    const existing = await prisma.recommendation.findFirst({
+      where: { userId: req.user.id, animeTitle },
+    })
+
+    if (existing) {
+      const err = new Error('Ya recomendaste este anime')
+      err.statusCode = 409
+      throw err
+    }
+
     const recommendation = await prisma.recommendation.create({
       data: { userId: req.user.id, animeTitle, animeImage, description },
     })

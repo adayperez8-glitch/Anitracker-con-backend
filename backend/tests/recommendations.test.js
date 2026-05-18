@@ -46,6 +46,16 @@ describe('Recommendations', () => {
     expect(res.body[0].animeTitle).toBe('Steins;Gate')
   })
 
+  it('POST /api/recommendations - 409 duplicate title', async () => {
+    const res = await request(app)
+      .post('/api/recommendations')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ animeTitle: 'Steins;Gate' })
+
+    expect(res.status).toBe(409)
+    expect(res.body.error).toBe('Ya recomendaste este anime')
+  })
+
   it('POST /api/recommendations - 400 empty title', async () => {
     const res = await request(app)
       .post('/api/recommendations')
