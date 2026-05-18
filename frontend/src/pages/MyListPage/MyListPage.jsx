@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useWatchlist, STATUS } from '../../context/WatchlistContext'
+import { useApi } from '../../hooks/useApi'
+import { useAuth } from '../../context/AuthContext'
 import styles from './MyListPage.module.css'
 
 const STATUS_LABELS = {
@@ -22,6 +24,42 @@ export default function MyListPage() {
   const { watchlist, removeFromWatchlist, updateProgress, updateStatus, cargando } = useWatchlist()
   const [filter, setFilter] = useState('all')
   const navigate = useNavigate()
+  const { usuario } = useAuth()
+  const { peticion } = useApi()
+  const [wallpaperActive, setWallpaperActive] = useState(false)
+  const [recomendados, setRecomendados] = useState(new Set())
+  const recomendando = useRef(false)
+
+  useEffect(() => {
+    const check = () => {
+      const bg = document.body.style.backgroundImage
+      setWallpaperActive(!!bg && bg !== 'none' && bg !== '')
+    }
+    check()
+    const obs = new MutationObserver(check)
+    obs.observe(document.body, { attributes: true, attributeFilter: ['style'] })
+    return () => obs.disconnect()
+  }, [])
+
+  const handleRecommend = async (anime, e) => {
+    e.stopPropagation()
+    if (recomendando.current || recomendados.has(anime.animeId)) return
+    recomendando.current = true
+    try {
+      await peticion('/api/recommendations', {
+        method: 'POST',
+        body: JSON.stringify({
+          animeTitle: anime.animeTitle,
+          animeImage: anime.animeImage || '',
+        }),
+      })
+      setRecomendados(prev => new Set(prev).add(anime.animeId))
+    } catch {
+      // ignore
+    } finally {
+      recomendando.current = false
+    }
+  }
 
   const filtered = filter === 'all'
     ? watchlist
@@ -149,6 +187,15 @@ export default function MyListPage() {
                   )}
                 </div>
 
+                {usuario && (
+                  <button
+                    className={`${styles.recommendBtn} ${wallpaperActive ? styles.recommendBtnWallpaper : ''}`}
+                    onClick={(e) => handleRecommend(anime, e)}
+                    disabled={recomendados.has(anime.animeId)}
+                  >
+                    {recomendados.has(anime.animeId) ? '✓ Recomendado' : 'Recomendar'}
+                  </button>
+                )}
                 <select
                   className={styles.statusSelect}
                   value={anime.status}
