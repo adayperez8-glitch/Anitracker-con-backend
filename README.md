@@ -230,34 +230,140 @@ Estados válidos: `WATCHING` · `COMPLETED` · `PAUSED` · `PENDING`
 ---
  
 ## Schema de base de datos
- 
+
 ```
 User
   id · email (UNIQUE) · password · name · power · bio · role: USER | ADMIN
- 
+
 UserAnime
   id · userId (FK→User) · animeId · animeTitle · animeImage
   status: WATCHING | COMPLETED | PAUSED | PENDING
   currentEpisode · totalEpisodes · isPublic
   UNIQUE (userId, animeId)
- 
+
 Friendship
   id · requesterId (FK→User) · receiverId (FK→User)
   status: PENDING | ACCEPTED | REJECTED · canSeeStatus
   UNIQUE (requesterId, receiverId)
- 
+
 Message
   id · senderId (FK→User) · receiverId (FK→User, nullable) · content
- 
+
 Recommendation
   id · userId (FK→User) · animeTitle · animeImage · description
+  UNIQUE (userId, animeTitle)
 ```
- 
+
 Todas las relaciones tienen `ON DELETE CASCADE`.
+
+### Diagrama Entidad-Relación
+
+```mermaid
+erDiagram
+    User {
+        int id PK
+        string email UK
+        string password
+        string name
+        string power
+        string bio
+        enum role
+        datetime createdAt
+    }
+
+    UserAnime {
+        int id PK
+        int userId FK
+        int animeId
+        string animeTitle
+        string animeImage
+        enum status
+        int currentEpisode
+        int totalEpisodes
+        boolean isPublic
+    }
+
+    Friendship {
+        int id PK
+        int requesterId FK
+        int receiverId FK
+        enum status
+        boolean canSeeStatus
+        datetime createdAt
+    }
+
+    Message {
+        int id PK
+        int senderId FK
+        int receiverId FK "nullable"
+        string content
+        datetime createdAt
+    }
+
+    Recommendation {
+        int id PK
+        int userId FK
+        string animeTitle
+        string animeImage
+        string description
+        datetime createdAt
+    }
+
+    User ||--o{ UserAnime : animeList
+    User ||--o{ Friendship : "sentRequests (requester)"
+    User ||--o{ Friendship : "receivedRequests (receiver)"
+    User ||--o{ Message : "sentMessages (sender)"
+    User ||--o{ Message : "receivedMessages (receiver)"
+    User ||--o{ Recommendation : recommendations
+```
+
+**Notación:** `||--o{` = uno a muchos. Todas las FK tienen `ON DELETE CASCADE`.
  
 ---
- 
-## Tests
+
+## Roles y permisos
+
+El sistema define **dos roles** mediante el enum `Role` en Prisma:
+
+| Rol | Descripción |
+|-----|-------------|
+| `USER` | Usuario estándar — puede gestionar su perfil, lista de anime, amigos, mensajes y recomendaciones |
+| `ADMIN` | Administrador — tiene todos los permisos de `USER` más la capacidad de eliminar cualquier usuario |
+
+### Matriz de permisos
+
+| Recurso | Método | Ruta | USER | ADMIN |
+|---------|--------|------|:----:|:-----:|
+| **Health** | GET | `/api/health` | ✅ | ✅ |
+| **Auth** | POST | `/api/auth/register` | ✅ | ✅ |
+| | POST | `/api/auth/login` | ✅ | ✅ |
+| **Users** | GET | `/api/users` | 🔒 | 🔒 |
+| | GET | `/api/users/me` | 🔒 | 🔒 |
+| | PATCH | `/api/users/me` | 🔒 | 🔒 |
+| | GET | `/api/users/:id` | ✅ | ✅ |
+| | DELETE | `/api/users/:id` | ❌ | 🔒 👑 |
+| **Anime** | GET | `/api/anime` | 🔒 | 🔒 |
+| | POST | `/api/anime` | 🔒 | 🔒 |
+| | PATCH | `/api/anime/:id` | 🔒 | 🔒 |
+| | DELETE | `/api/anime/:id` | 🔒 | 🔒 |
+| **Friends** | GET | `/api/friends` | 🔒 | 🔒 |
+| | GET | `/api/friends/requests` | 🔒 | 🔒 |
+| | POST | `/api/friends` | 🔒 | 🔒 |
+| | PATCH | `/api/friends/:id` | 🔒 | 🔒 |
+| | DELETE | `/api/friends/:id` | 🔒 | 🔒 |
+| **Messages** | GET | `/api/messages` | 🔒 | 🔒 |
+| | POST | `/api/messages` | 🔒 | 🔒 |
+| **Recommendations** | GET | `/api/recommendations/:userId` | ✅ | ✅ |
+| | POST | `/api/recommendations` | 🔒 | 🔒 |
+| | DELETE | `/api/recommendations/:id` | 🔒 | 🔒 |
+
+**Leyenda:**
+- ✅ — Público, no requiere autenticación
+- 🔒 — Requiere `Authorization: Bearer <token>` (cualquier rol)
+- 🔒 👑 — Requiere token **y** rol `ADMIN`
+- ❌ — Sin acceso
+
+
  
 ```bash
 # Backend (Vitest + Supertest)
