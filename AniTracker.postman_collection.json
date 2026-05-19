@@ -1,0 +1,543 @@
+{
+  "info": {
+    "name": "AniTracker API",
+    "description": "Colección completa de la API de AniTracker. Usa la variable `base_url` (por defecto: Railway).\n\n**Setup:**\n1. Ejecuta \"Register\" o \"Login\" para obtener un token\n2. El token se guarda automáticamente en la variable `token`\n3. El resto de endpoints usarán el token en el header Authorization",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://anitracker-con-backend-production.up.railway.app",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "animeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "friendId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "messageId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "recommendationId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /api/health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /api/auth/register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "    pm.collectionVariables.set('userId', String(json.usuario.id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@test.com\",\n  \"password\": \"123456\",\n  \"name\": \"Demo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/auth/login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('token', json.token);",
+                  "    pm.collectionVariables.set('userId', String(json.usuario.id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@anitracker.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /api/users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/users?q=",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users?q=aday",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"],
+              "query": [
+                { "key": "q", "value": "aday" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/users/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me"]
+            }
+          }
+        },
+        {
+          "name": "PATCH /api/users/me",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"NuevoNombre\",\n  \"power\": \"enhancer\",\n  \"bio\": \"Fan del anime\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/users/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/users/:id (admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/{{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Anime List",
+      "item": [
+        {
+          "name": "GET /api/anime",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/anime",
+              "host": ["{{base_url}}"],
+              "path": ["api", "anime"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/anime",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('animeId', String(pm.response.json().id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"animeId\": 21,\n  \"animeTitle\": \"One Piece\",\n  \"animeImage\": \"https://cdn.myanimelist.net/images/anime/1244/138851.jpg\",\n  \"totalEpisodes\": 1100\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/anime",
+              "host": ["{{base_url}}"],
+              "path": ["api", "anime"]
+            }
+          }
+        },
+        {
+          "name": "PATCH /api/anime/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\",\n  \"currentEpisode\": 1100\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/anime/{{animeId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "anime", "{{animeId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/anime/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/anime/{{animeId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "anime", "{{animeId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Friends",
+      "item": [
+        {
+          "name": "GET /api/friends",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/friends",
+              "host": ["{{base_url}}"],
+              "path": ["api", "friends"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/friends/requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/friends/requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "friends", "requests"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/friends",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('friendId', String(pm.response.json().id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/friends",
+              "host": ["{{base_url}}"],
+              "path": ["api", "friends"]
+            }
+          }
+        },
+        {
+          "name": "PATCH /api/friends/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACCEPTED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/friends/{{friendId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "friends", "{{friendId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/friends/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/friends/{{friendId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "friends", "{{friendId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "GET /api/messages (global)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/messages?receiverId=",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/messages?receiverId=2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "messages"],
+              "query": [
+                { "key": "receiverId", "value": "2" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/messages (global)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hola a todos!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/messages (privado)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hola! Cómo estás?\",\n  \"receiverId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "messages"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recommendations",
+      "item": [
+        {
+          "name": "GET /api/recommendations/:userId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/recommendations/{{userId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommendations", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/recommendations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.collectionVariables.set('recommendationId', String(pm.response.json().id));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"animeTitle\": \"Attack on Titan\",\n  \"animeImage\": \"https://cdn.myanimelist.net/images/anime/10/47347.jpg\",\n  \"description\": \"Imperdible!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/recommendations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommendations"]
+            }
+          }
+        },
+        {
+          "name": "DELETE /api/recommendations/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/recommendations/{{recommendationId}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommendations", "{{recommendationId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
