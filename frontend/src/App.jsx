@@ -11,6 +11,11 @@ import SearchPage from './pages/SearchPage/SearchPage'
 import AnimeDetailPage from './pages/AnimeDetailPage/AnimeDetailPage'
 import MyListPage from './pages/MyListPage/MyListPage'
 import CalendarPage from './pages/CalendarPage/CalendarPage'
+import UsersPage from './pages/UsersPage/UsersPage'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
+import MyProfilePage from './pages/MyProfilePage/MyProfilePage'
+import FriendsPage from './pages/FriendsPage/FriendsPage'
+import ChatPage from './pages/ChatPage/ChatPage'
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage'
 
 function Layout() {
@@ -23,6 +28,11 @@ function Layout() {
         <Route path="/anime/:id" element={<ProtectedRoute><AnimeDetailPage /></ProtectedRoute>} />
         <Route path="/mylist" element={<ProtectedRoute><MyListPage /></ProtectedRoute>} />
         <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+        <Route path="/users" element={<ProtectedRoute><UsersPage /></ProtectedRoute>} />
+        <Route path="/profile/:id" element={<ProfilePage />} />
+        <Route path="/my-profile" element={<ProtectedRoute><MyProfilePage /></ProtectedRoute>} />
+        <Route path="/friends" element={<ProtectedRoute><FriendsPage /></ProtectedRoute>} />
+        <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>

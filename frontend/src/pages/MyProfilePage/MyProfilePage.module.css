@@ -1,0 +1,230 @@
+.page {
+  min-height: calc(100vh - 52px);
+  padding: var(--space-2xl) var(--space-lg);
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  margin-bottom: var(--space-2xl);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-accent);
+}
+
+.input, .select, .textarea {
+  padding: var(--space-md);
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: #1a1a2e;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.select option {
+  color: #1a1a2e;
+  background: #ffffff;
+}
+
+.input:focus, .select:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-glow);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.avatarPreview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 2rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarLetter {
+  font-family: var(--font-display);
+}
+
+.fileInput {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.btn {
+  padding: var(--space-md);
+  background: var(--color-accent);
+  color: white;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.btn:hover {
+  background: var(--color-accent-3);
+  box-shadow: var(--shadow-accent);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.success {
+  color: #22c55e;
+  text-align: center;
+  font-weight: 700;
+}
+
+.error {
+  color: var(--color-accent);
+  text-align: center;
+}
+
+.requests {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+  margin-bottom: var(--space-lg);
+}
+
+.requestList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.requestCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.requestAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.requestName {
+  font-weight: 700;
+}
+
+.requestPower {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.requestActions {
+  margin-left: auto;
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.acceptBtn, .rejectBtn {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.acceptBtn {
+  background: var(--color-accent);
+  color: white;
+}
+
+.acceptBtn:hover {
+  background: var(--color-accent-3);
+}
+
+.rejectBtn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.rejectBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.loading, .empty {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-lg);
+}

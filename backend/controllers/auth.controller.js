@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import prisma from '../lib/prisma.js'
+import { sendWebhook } from '../lib/webhook.js'
 
 export async function register(req, res, next) {
   try {
@@ -18,6 +19,8 @@ export async function register(req, res, next) {
     const user = await prisma.user.create({
       data: { email, password: hashedPassword, name },
     })
+
+    sendWebhook('user_registered', { userId: user.id, email: user.email, name: user.name })
 
     const token = jwt.sign(
       { id: user.id, email: user.email, name: user.name, role: user.role },

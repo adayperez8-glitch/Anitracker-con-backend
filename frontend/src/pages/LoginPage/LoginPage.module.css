@@ -84,7 +84,7 @@
 
 .select option {
   background: #ffffff;
-  color: var(--color-text-primary);
+  color: #1a1a2e;
 }
 
 .powerHint {

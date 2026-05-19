@@ -33,7 +33,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 var(--space-lg);
-  height: 64px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -41,8 +41,8 @@
 
 .logo {
   font-family: var(--font-display);
-  font-size: 1.6rem;
-  letter-spacing: 3px;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
   transition: all 0.3s;
 }
 .logo:hover {
@@ -54,23 +54,24 @@
 .links {
   list-style: none;
   display: flex;
-  gap: var(--space-xl);
+  gap: var(--space-md);
   align-items: center;
 }
 
 .link {
   font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 1px;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
   color: #3a7bd5;
   text-transform: uppercase;
   transition: all 0.3s;
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: 4px 8px;
+  gap: 4px;
+  padding: 4px 6px;
   border-radius: var(--radius-sm);
+  white-space: nowrap;
 }
 
 .link:hover {
@@ -80,16 +81,17 @@
 
 .activeLink {
   font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 1px;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
   position: relative;
   color: #3a7bd5;
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: 4px 8px;
+  gap: 4px;
+  padding: 4px 6px;
   border-radius: var(--radius-sm);
+  white-space: nowrap;
   transition: all 0.3s;
 }
 
@@ -115,12 +117,12 @@
   justify-content: center;
   background: var(--color-accent);
   color: white;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 800;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 9px;
-  padding: 0 4px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  padding: 0 3px;
   animation: pop 0.3s ease;
 }
 
@@ -131,13 +133,13 @@
 }
 
 .wallpaperSelect {
-  padding: var(--space-xs) var(--space-md);
+  padding: 2px var(--space-sm);
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   color: var(--color-text-secondary);
   font-family: var(--font-body);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 700;
   transition: all 0.3s;
 }
@@ -154,8 +156,28 @@
   box-shadow: 0 0 6px rgba(125, 212, 252, 0.3);
 }
 
+.navAvatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.navAvatarLetter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
 .userInfo {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--color-accent-2);
   font-weight: 700;
   transition: all 0.3s;
@@ -170,9 +192,9 @@
   background: transparent;
   border: 1px solid #3a7bd5;
   color: #3a7bd5;
-  padding: var(--space-xs) var(--space-md);
+  padding: 2px var(--space-sm);
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 700;
   transition: all 0.3s;
 }
@@ -186,14 +208,14 @@
 .hamburger {
   display: none;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   background: transparent;
-  padding: var(--space-xs);
+  padding: 4px;
 }
 
 .bar {
   display: block;
-  width: 22px;
+  width: 18px;
   height: 2px;
   background: var(--color-text-primary);
   border-radius: 2px;
@@ -205,7 +227,7 @@
   box-shadow: 0 0 4px rgba(125, 212, 252, 0.5);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .hamburger { display: flex; }
 
   .links { display: none; }
@@ -213,7 +235,7 @@
   .linksOpen {
     display: flex;
     position: fixed;
-    top: 64px;
+    top: 52px;
     left: 0;
     right: 0;
     flex-direction: column;

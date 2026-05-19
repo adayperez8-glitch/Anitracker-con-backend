@@ -1,75 +1,114 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { useApi } from '../hooks/useApi'
+import { useAuth } from './AuthContext'
 
 const WatchlistContext = createContext(null)
 
 export const STATUS = {
-  WATCHING: 'watching',
-  COMPLETED: 'completed',
-  PAUSED: 'paused',
-  PENDING: 'pending',
+  WATCHING: 'WATCHING',
+  COMPLETED: 'COMPLETED',
+  PAUSED: 'PAUSED',
+  PENDING: 'PENDING',
 }
 
 export function WatchlistProvider({ children }) {
-  const [watchlist, setWatchlist] = useState(() => {
-    try {
-      const saved = localStorage.getItem('anitracker-watchlist')
-      return saved ? JSON.parse(saved) : []
-    } catch {
-      return []
-    }
-  })
+  const [watchlist, setWatchlist] = useState([])
+  const [cargando, setCargando] = useState(true)
+  const { peticion } = useApi()
+  const { usuario } = useAuth()
 
   useEffect(() => {
-    localStorage.setItem('anitracker-watchlist', JSON.stringify(watchlist))
-  }, [watchlist])
+    setWatchlist([])
+    setCargando(true)
+    if (!usuario) {
+      setCargando(false)
+      return
+    }
+    let cancel = false
+    ;(async () => {
+      try {
+        const data = await peticion('/api/anime')
+        if (!cancel) setWatchlist(data)
+      } catch {
+        if (!cancel) setWatchlist([])
+      } finally {
+        if (!cancel) setCargando(false)
+      }
+    })()
+    return () => { cancel = true }
+  }, [usuario])
 
-  const addToWatchlist = (anime) => {
-    setWatchlist((prev) => {
-      if (prev.find((a) => a.mal_id === anime.mal_id)) return prev
-      return [
-        ...prev,
-        {
-          ...anime,
-          status: STATUS.PENDING,
-          currentEpisode: 0,
-          addedAt: Date.now(),
-        },
-      ]
-    })
+  const addToWatchlist = async (anime) => {
+    try {
+      const entry = await peticion('/api/anime', {
+        method: 'POST',
+        body: JSON.stringify({
+          animeId: anime.mal_id,
+          animeTitle: anime.title,
+          animeImage: anime.images?.jpg?.image_url || '',
+          totalEpisodes: anime.episodes || 0,
+        }),
+      })
+      setWatchlist((prev) => [...prev, entry])
+      return true
+    } catch {
+      return false
+    }
   }
 
-  const removeFromWatchlist = (mal_id) => {
-    setWatchlist((prev) => prev.filter((a) => a.mal_id !== mal_id))
+  const removeFromWatchlist = async (animeId) => {
+    const entry = watchlist.find((a) => a.animeId === animeId)
+    if (!entry) return
+    try {
+      await peticion(`/api/anime/${entry.id}`, { method: 'DELETE' })
+      setWatchlist((prev) => prev.filter((a) => a.animeId !== animeId))
+    } catch {
+      //
+    }
   }
 
-  const isInWatchlist = (mal_id) => {
-    return watchlist.some((a) => a.mal_id === mal_id)
+  const isInWatchlist = (animeId) => {
+    return watchlist.some((a) => a.animeId === animeId)
   }
 
-  const updateProgress = (mal_id, currentEpisode) => {
-    setWatchlist((prev) =>
-      prev.map((a) =>
-        a.mal_id === mal_id
-          ? { ...a, currentEpisode: Math.max(0, currentEpisode) }
-          : a
-      )
-    )
+  const updateProgress = async (animeId, currentEpisode) => {
+    const entry = watchlist.find((a) => a.animeId === animeId)
+    if (!entry) return
+    const ep = Math.max(0, currentEpisode)
+    try {
+      const updated = await peticion(`/api/anime/${entry.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ currentEpisode: ep }),
+      })
+      setWatchlist((prev) => prev.map((a) => (a.id === entry.id ? updated : a)))
+    } catch {
+      //
+    }
   }
 
-  const updateStatus = (mal_id, status) => {
-    setWatchlist((prev) =>
-      prev.map((a) => (a.mal_id === mal_id ? { ...a, status } : a))
-    )
+  const updateStatus = async (animeId, status) => {
+    const entry = watchlist.find((a) => a.animeId === animeId)
+    if (!entry) return
+    try {
+      const updated = await peticion(`/api/anime/${entry.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      })
+      setWatchlist((prev) => prev.map((a) => (a.id === entry.id ? updated : a)))
+    } catch {
+      //
+    }
   }
 
-  const getAnimeData = (mal_id) => {
-    return watchlist.find((a) => a.mal_id === mal_id) || null
+  const getAnimeData = (animeId) => {
+    return watchlist.find((a) => a.animeId === animeId) || null
   }
 
   return (
     <WatchlistContext.Provider
       value={{
         watchlist,
+        cargando,
         addToWatchlist,
         removeFromWatchlist,
         isInWatchlist,
